@@ -1,49 +1,67 @@
-// Dashboard.jsx
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import { WebSocketContext } from '../../services/WebSocketProvider.jsx';
-import ChartComponent from '../MyChart/ChartComponent.jsx';
-import WaveformChart from '../../assets/sound/WaveformChart.jsx';
-
+import React, { useState, useEffect } from "react";
 
 const Dashboard = () => {
-  const { data, isConnected } = useContext(WebSocketContext);
-  const [isDataRunning, setIsDataRunning] = useState(true);
-  const audioRef = useRef(null); // สร้าง ref สำหรับ audio element
+  const [students, setStudents] = useState([]);
+  const [isConnected, setIsConnected] = useState(true);
+  const apiUrl = "http://localhost:5000/students";
 
-  // Resume AudioContext ที่อยู่ใน WaveformChart
-  audioRef.current?.resume();
-
-  const toggleData = () => {
-    setIsDataRunning((prev) => !prev);
-  };
-
-  // โหลดไฟล์เสียงและแปลงเป็นข้อมูลคลื่นเสียง
   useEffect(() => {
-    const loadAudioData = async () => {
-      const response = await fetch('../../assets/sound/Exsamples/Cycle1.wav'); // เปลี่ยนเป็น path ของไฟล์เสียง
-      const arrayBuffer = await response.arrayBuffer();
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      const channelData = audioBuffer.getChannelData(0); // ใช้แค่ช่องแรก
-      setAudioData(Array.from(channelData));
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        setStudents(data);
+      } catch (error) {
+        console.error("❌ Error fetching students:", error);
+        setIsConnected(false);
+      }
     };
 
-    loadAudioData();
+    fetchStudents();
   }, []);
 
+  const checkedInCount = students.filter(student => student.Check_Status === "YES").length;
+  const notCheckedInCount = students.filter(student => student.Check_Status === "NO").length;
+
   return (
-    <div className="flex-1 bg-gray-50 text-black p-4 grid grid-cols-3 gap-4 h-screen">
-      <div className="bg-white rounded-lg p-4 shadow-md col-span-1">
-        <h2 className="font-bold text-lg mb-2">รายชื่อนักศึกษา</h2>
-        <p>{isConnected ? "Connected" : "Disconnected"}</p>
-        <p>Latest Power Consumption: {isDataRunning && data ? data["Energy Consumption"].Power.toFixed(2) + ' W' : 'N/A'}</p>
-        <p>Latest Pressure: {isDataRunning && data ? data.Pressure.toFixed(2) + ' Pa' : 'N/A'}</p>
-        <p>Latest Force: {isDataRunning && data ? data.Force.toFixed(2) + ' N' : 'N/A'}</p>
-        <p>Position of the Punch: {isDataRunning && data ? data["Position of the Punch"].toFixed(2) + ' mm' : 'N/A'}</p>
+    <div className="flex-1 bg-white text-black p-4 grid grid-cols-4 gap-4 min-h-screen">
+      {/* กล่องแสดงรายชื่อนักศึกษา (ใหญ่ขึ้น) */}
+      <div className="bg-white text-black rounded-lg p-4 shadow-md col-span-3">
+        <h2 className="font-bold text-lg mb-2">📋 รายชื่อนักศึกษา</h2>
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 px-4 py-2">📌 รหัสวิชา</th>
+              <th className="border border-gray-300 px-4 py-2">📌 Student ID</th>
+              <th className="border border-gray-300 px-4 py-2">👤 ชื่อ</th>
+              <th className="border border-gray-300 px-4 py-2">📅 วันที่เรียน</th>
+              <th className="border border-gray-300 px-4 py-2">⏰ เวลาเรียน</th>
+              <th className="border border-gray-300 px-4 py-2">📌 สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.Student_ID} className="text-center">
+                <td className="border border-gray-300 px-4 py-2">{student.Course_ID}</td>
+                <td className="border border-gray-300 px-4 py-2">{student.Student_ID}</td>
+                <td className="border border-gray-300 px-4 py-2">{student.Student_Name}</td>
+                <td className="border border-gray-300 px-4 py-2">{student.Class_data}</td>
+                <td className="border border-gray-300 px-4 py-2">{student.Class_time}</td>
+                <td className={`border border-gray-300 px-4 py-2 ${student.Check_Status === "YES" ? "text-green-500" : "text-red-500"}`}>
+                  {student.Check_Status === "YES" ? "✅ YES" : "❌ NO"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      <div className="bg-white text-black rounded-lg p-4 shadow-md col-span-2">
-        <h2 className="font-bold text-lg mb-2">Machine Chart</h2>
-        <ChartComponent isDataRunning={isDataRunning} toggleData={toggleData} />
+
+      {/* กล่องแสดงสถานะระบบ (ขนาดเล็กลง) */}
+      <div className="bg-white rounded-lg p-4 shadow-md col-span-1">
+        <h2 className="font-bold text-lg mb-2">🔹 ระบบ</h2>
+        <p className="font-bold">{isConnected ? "✅ Connected" : "❌ Disconnected"}</p>
+        <p>✅ เช็คชื่อแล้ว: <b>{checkedInCount}</b> คน</p>
+        <p>❌ ยังไม่ได้เช็คชื่อ: <b>{notCheckedInCount}</b> คน</p>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from './components/Layout/Navbar/Navbar';
 import Topbar from './components/Layout/TopBar/Topbar';
 import Dashboard from './components/DashBoard/DashBoard';
-import { WebSocketProvider } from './components/services/WebSocketProvider';
+import { WebSocketProvider } from './services/WebSocketProvider';
 
 function App() {
   return (
