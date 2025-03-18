@@ -56,12 +56,22 @@ const Dashboard = () => {
         </table>
       </div>
 
-      {/* กล่องแสดงสถานะระบบ (ขนาดเล็กลง) */}
-      <div className="bg-white rounded-lg p-4 shadow-md col-span-1">
+      {/* กล่องแสดงระบบ (Card เต็มรูปแบบ รองรับการเพิ่มข้อมูลด้านล่าง) */}
+      <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-300 col-span-1 flex flex-col gap-4">
         <h2 className="font-bold text-lg mb-2">🔹 ระบบ</h2>
-        <p className="font-bold">{isConnected ? "✅ Connected" : "❌ Disconnected"}</p>
-        <p>✅ เช็คชื่อแล้ว: <b>{checkedInCount}</b> คน</p>
-        <p>❌ ยังไม่ได้เช็คชื่อ: <b>{notCheckedInCount}</b> คน</p>
+        <div className="bg-gray-100 p-3 rounded-lg shadow-inner">
+          <p className="font-bold">{isConnected ? "✅ Connected" : "❌ Disconnected"}</p>
+          <p>✅ เช็คชื่อแล้ว: <b>{checkedInCount}</b> คน</p>
+          <p>❌ ยังไม่ได้เช็คชื่อ: <b>{notCheckedInCount}</b> คน</p>
+        </div>
+
+        {/* ฟังก์ชันเพิ่มเติมที่สามารถเพิ่มได้ */}
+        <div className="bg-gray-100 p-3 rounded-lg shadow-inner">
+          <h3 className="font-bold">🛠 ฟังก์ชันเพิ่มเติม</h3>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-600 transition">
+            รีเฟรชข้อมูล
+          </button>
+        </div>
       </div>
     </div>
   );

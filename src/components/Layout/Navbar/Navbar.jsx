@@ -5,7 +5,7 @@ const Navbar = () => {
     <div className="bg-white h-100 p-4 text-zinc-800 w-59 ">
       <div className="flex items-center space-x-2 mb-10">
         <span className="icon">💻</span>
-        <span className="text-xl font-bold">CPE451</span>
+        <span className="text-xl font-bold">CPE-495</span>
       </div>
       <ul className="space-y-4">
         <li><a href="#dashboard" className="flex items-center space-x-2 hover:text-gray-400"><span className="icon">📊</span><i className="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
